@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <title>MPilot UI Example</title>
+
+  <script src="../dist/mpilot-ui.bundle.js"></script>
+  <link rel='stylesheet' href='../dist/mpilot-ui.bundle.css'>
+</head>
+<body>
+  <div id="ModelSource" style="display: none;">
+    Urban_Development_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Urban_Development_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Urban&nbsp;Development&nbsp;Density,Description:Urban&nbsp;Development&nbsp;Density]
+    )
+    Low_Urban_Development_Fz = CvtToFuzzy(
+        InFieldName = Urban_Development_Density,
+        FalseThreshold = 20,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Urban&nbsp;Development&nbsp;Fz,Description:Low&nbsp;Urban&nbsp;Development&nbsp;Fz]
+    )
+    Rds_Hwy_Primary_S1100_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Rds_Hwy_Primary_S1100_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Rds&nbsp;Hwy&nbsp;Primary&nbsp;S1100&nbsp;Density,Description:Rds&nbsp;Hwy&nbsp;Primary&nbsp;S1100&nbsp;Density]
+    )
+    Rds_Hwy_Secondary_S1200_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Rds_Hwy_Secondary_S1200_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Rds&nbsp;Hwy&nbsp;Secondary&nbsp;S1200&nbsp;Density,Description:Rds&nbsp;Hwy&nbsp;Secondary&nbsp;S1200&nbsp;Density]
+    )
+    Rds_Hwy_Ramps_S1630_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Rds_Hwy_Ramps_S1630_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Rds&nbsp;Hwy&nbsp;Ramps&nbsp;S1630&nbsp;Density,Description:Rds&nbsp;Hwy&nbsp;Ramps&nbsp;S1630&nbsp;Density]
+    )
+    Rds_Local_S1400_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Rds_Local_S1400_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Rds&nbsp;Local&nbsp;S1400&nbsp;Density,Description:Rds&nbsp;Local&nbsp;S1400&nbsp;Density]
+    )
+    Rds_Service_S1640_S1740_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Rds_Service_S1640_S1740_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Rds&nbsp;Service&nbsp;S1640&nbsp;S1740&nbsp;Density,Description:Rds&nbsp;Service&nbsp;S1640&nbsp;S1740&nbsp;Density]
+    )
+    TIGER_4WD_Trails_Unpaved_S1500_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = TIGER_4WD_Trails_Unpaved_S1500_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:TIGER&nbsp;4WD&nbsp;Trails&nbsp;Unpaved&nbsp;S1500&nbsp;Density,Description:TIGER&nbsp;4WD&nbsp;Trails&nbsp;Unpaved&nbsp;S1500&nbsp;Density]
+    )
+    Rd_Class_Weighted_Sum = WeightedSum(
+        InFieldNames = [Rds_Hwy_Primary_S1100_Density,Rds_Hwy_Secondary_S1200_Density,Rds_Hwy_Ramps_S1630_Density,Rds_Local_S1400_Density,Rds_Service_S1640_S1740_Density,TIGER_4WD_Trails_Unpaved_S1500_Density],
+        Weights = [12,8,6,2,0.5,0.3],
+        Metadata = [ColorMap:PiYG,DisplayName:Rd&nbsp;Class&nbsp;Weighted&nbsp;Sum,Description:Rd&nbsp;Class&nbsp;Weighted&nbsp;Sum]
+    )
+    Low_Wted_Rd_Cls_Development_Density_Fz = CvtToFuzzy(
+        InFieldName = Rd_Class_Weighted_Sum,
+        FalseThreshold = 10,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Wted&nbsp;Rd&nbsp;Cls&nbsp;Development&nbsp;Density&nbsp;Fz,Description:Low&nbsp;Wted&nbsp;Rd&nbsp;Cls&nbsp;Development&nbsp;Density&nbsp;Fz]
+    )
+    Trans_110kv_Line_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Trans_110kv_Line_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Trans&nbsp;110kv&nbsp;Line&nbsp;Density,Description:Trans&nbsp;110kv&nbsp;Line&nbsp;Density]
+    )
+    Pipelines_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Pipelines_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Pipelines&nbsp;Density,Description:Pipelines&nbsp;Density]
+    )
+    Railroad_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Railroad_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Railroad&nbsp;Density,Description:Pipelines&nbsp;Density]
+    )
+    OHV_Ln_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = OHV_Ln_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:OHV&nbsp;Ln&nbsp;Density,Description:OHV&nbsp;Ln&nbsp;Density]
+    )
+    Non_TIGER_Rd_Cls_Linear_Development_Weighted_Sum = WeightedSum(
+        InFieldNames = [Trans_110kv_Line_Density,Pipelines_Density,Railroad_Density,OHV_Ln_Density],
+        Weights = [1,1,1.5,0.5],
+        Metadata = [ColorMap:PiYG,DisplayName:Non&nbsp;TIGER&nbsp;Rd&nbsp;Cls&nbsp;Linear&nbsp;Development&nbsp;Weighted&nbsp;Sum,Description:Non&nbsp;TIGER&nbsp;Rd&nbsp;Cls&nbsp;Linear&nbsp;Development&nbsp;Weighted&nbsp;Sum]
+    )
+    Non_TIGER_Rd_Cls_Linear_Development_Weighted_Fz = CvtToFuzzy(
+        InFieldName = Non_TIGER_Rd_Cls_Linear_Development_Weighted_Sum,
+        FalseThreshold = 4,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Non&nbsp;TIGER&nbsp;Rd&nbsp;Cls&nbsp;Linear&nbsp;Development&nbsp;Weighted&nbsp;Fz,Description:Non&nbsp;TIGER&nbsp;Rd&nbsp;Cls&nbsp;Linear&nbsp;Development&nbsp;Weighted&nbsp;Fz]
+    )
+    Low_Total_Wted_Linear_Development = FuzzyAnd(
+        InFieldNames = [Low_Wted_Rd_Cls_Development_Density_Fz,Non_TIGER_Rd_Cls_Linear_Development_Weighted_Fz],
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Total&nbsp;Wted&nbsp;Linear&nbsp;Development,Description:Low&nbsp;Total&nbsp;Wted&nbsp;Linear&nbsp;Development]
+    )
+    Low_Urban_and_Linear_Development_Fz = FuzzyWeightedUnion(
+        InFieldNames = [Low_Urban_Development_Fz,Low_Total_Wted_Linear_Development],
+        Weights = [40,60],
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Urban&nbsp;and&nbsp;Linear&nbsp;Development&nbsp;Fz,Description:Low&nbsp;Urban&nbsp;and&nbsp;Linear&nbsp;Development&nbsp;Fz]
+    )
+    Mine_Pt_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Mine_Pt_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Mine&nbsp;Pt&nbsp;Density,Description:Mine&nbsp;Pt&nbsp;Density]
+    )
+    Oil_and_Gas_Wells_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Oil_and_Gas_Wells_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Oil&nbsp;and&nbsp;Gas&nbsp;Wells&nbsp;Density,Description:Oil&nbsp;and&nbsp;Gas&nbsp;Wells&nbsp;Density]
+    )
+    Geothermal_Wells_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Geothermal_Wells_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Geothermal&nbsp;Wells&nbsp;Density,Description:Oil&nbsp;and&nbsp;Gas&nbsp;Wells&nbsp;Density]
+    )
+    Wind_Turbines_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Wind_Turbines_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Wind&nbsp;Turbines&nbsp;Density,Description:Wind&nbsp;Turbines&nbsp;Density]
+    )
+    FCC_Comm_Towers_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = FCC_Comm_Towers_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:FCC&nbsp;Comm&nbsp;Towers&nbsp;Density,Description:FCC&nbsp;Comm&nbsp;Towers&nbsp;Density]
+    )
+    Power_Plant_Pt_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Power_Plant_Pt_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Power&nbsp;Plant&nbsp;Pt&nbsp;Density,Description:Power&nbsp;Plant&nbsp;Pt&nbsp;Density]
+    )
+    Petrol_Refinery_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Petrol_Refinery_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Petrol&nbsp;Refinery&nbsp;Density,Description:Petrol&nbsp;Refinery&nbsp;Density]
+    )
+    Weighted_Sum_of_Energy_Mines_and_Comm_Pts = WeightedSum(
+        InFieldNames = [Mine_Pt_Density,Oil_and_Gas_Wells_Density,Geothermal_Wells_Density,Wind_Turbines_Density,FCC_Comm_Towers_Density,Power_Plant_Pt_Density,Petrol_Refinery_Density],
+        Weights = [1,1,1,1,1,2,2],
+        Metadata = [ColorMap:PiYG,DisplayName:Weighted&nbsp;Sum&nbsp;of&nbsp;Energy&nbsp;Mines&nbsp;and&nbsp;Comm&nbsp;Pts,Description:Weighted&nbsp;Sum&nbsp;of&nbsp;Energy&nbsp;Mines&nbsp;and&nbsp;Comm&nbsp;Pts]
+    )
+    Low_Energy_Mining_Comm_Pts_Fz = CvtToFuzzy(
+        InFieldName = Weighted_Sum_of_Energy_Mines_and_Comm_Pts,
+        FalseThreshold = 12,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Energy&nbsp;Mining&nbsp;Comm&nbsp;Pts&nbsp;Fz,Description:Low&nbsp;Energy&nbsp;Mining&nbsp;Comm&nbsp;Pts&nbsp;Fz]
+    )
+    EPA_Sites_Super_Brown_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = EPA_Sites_Super_Brown_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:EPA&nbsp;Sites&nbsp;Super&nbsp;Brown&nbsp;Density,Description:EPA&nbsp;Sites&nbsp;Super&nbsp;Brown&nbsp;Density]
+    )
+    Low_Polluted_Site_Density = CvtToFuzzy(
+        InFieldName = EPA_Sites_Super_Brown_Density,
+        FalseThreshold = 2,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Polluted&nbsp;Site&nbsp;Density,Description:Low&nbsp;Polluted&nbsp;Site&nbsp;Density]
+    )
+    Treatment_Pond_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Treatment_Pond_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Treatment&nbsp;Pond&nbsp;Density,Description:Treatment&nbsp;Pond&nbsp;Density]
+    )
+    Low_Treatment_Pond_Coverage_Polygons_Fz = CvtToFuzzy(
+        InFieldName = Treatment_Pond_Density,
+        FalseThreshold = 80,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Treatment&nbsp;Pond&nbsp;Coverage&nbsp;Polygons&nbsp;Fz,Description:Low&nbsp;Treatment&nbsp;Pond&nbsp;Coverage&nbsp;Polygons&nbsp;Fz]
+    )
+    Mine_Footprint_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Mine_Footprint_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Mine&nbsp;Footprint&nbsp;Density,Description:Mine&nbsp;Footprint&nbsp;Density]
+    )
+    Low_Mining_Footprint_Coverage_Polygons_Fz = CvtToFuzzy(
+        InFieldName = Mine_Footprint_Density,
+        FalseThreshold = 70,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Mining&nbsp;Footprint&nbsp;Coverage&nbsp;Polygons&nbsp;Fz,Description:Low&nbsp;Mining&nbsp;Footprint&nbsp;Coverage&nbsp;Polygons&nbsp;Fz]
+    )
+    Solar_Footprint_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Solar_Footprint_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Solar&nbsp;Footprint&nbsp;Density,Description:Solar&nbsp;Footprint&nbsp;Density]
+    )
+    Solar_Footprints_Polygon_Fz = CvtToFuzzy(
+        InFieldName = Solar_Footprint_Density,
+        FalseThreshold = 70,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Solar&nbsp;Footprints&nbsp;Polygon&nbsp;Fz,Description:Solar&nbsp;Footprints&nbsp;Polygon&nbsp;Fz]
+    )
+    Low_Energy_Mining_Pollution_Fz = FuzzyAnd(
+        InFieldNames = [Low_Energy_Mining_Comm_Pts_Fz,Low_Polluted_Site_Density,Low_Treatment_Pond_Coverage_Polygons_Fz,Low_Mining_Footprint_Coverage_Polygons_Fz,Solar_Footprints_Polygon_Fz],
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Energy&nbsp;Mining&nbsp;Pollution&nbsp;Fz,Description:Low&nbsp;Energy&nbsp;Mining&nbsp;Pollution&nbsp;Fz]
+    )
+    Low_Permanent_Development_Fz = FuzzyAnd(
+        InFieldNames = [Low_Urban_and_Linear_Development_Fz,Low_Energy_Mining_Pollution_Fz],
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Permanent&nbsp;Development&nbsp;Fz,Description:Low&nbsp;Permanent&nbsp;Development&nbsp;Fz]
+    )
+    Timber_Clearcuts_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Timber_Clearcuts_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Timber&nbsp;Clearcuts&nbsp;Density,Description:Timber&nbsp;Clearcuts&nbsp;Density]
+    )
+    Agriculture_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Agriculture_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Agriculture&nbsp;Density,Description:Agriculture&nbsp;Density]
+    )
+    Invasives_Density = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Invasives_Density,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Invasives&nbsp;Density,Description:Invasives&nbsp;Density]
+    )
+    Vegetation_State_Impacts_without_VegDeparture_Weighted_Sum = WeightedSum(
+        InFieldNames = [Timber_Clearcuts_Density,Agriculture_Density,Invasives_Density],
+        Weights = [0.3,0.5,0.2],
+        Metadata = [ColorMap:PiYG,DisplayName:Vegetation&nbsp;State&nbsp;Impacts&nbsp;Weighted&nbsp;Sum,Description:Vegetation&nbsp;State&nbsp;Impacts&nbsp;without&nbsp;VegDeparture&nbsp;Weighted&nbsp;Sum]
+    )
+    Low_Vegetation_State_Impacts_without_VegDeparture_Fz = CvtToFuzzy(
+        InFieldName = Vegetation_State_Impacts_without_VegDeparture_Weighted_Sum,
+        FalseThreshold = 70,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Vegetation&nbsp;State&nbsp;Impacts&nbsp;Fz,Description:Low&nbsp;Vegetation&nbsp;State&nbsp;Impacts&nbsp;without&nbsp;VegDeparture&nbsp;Fz]
+    )
+    Frag_Nearest_Neighbor_v2_Ave = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Frag_Nearest_Neighbor_v2_Ave,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Frag&nbsp;Nearest&nbsp;Neighbor&nbsp;Ave,Description:Frag&nbsp;Nearest&nbsp;Neighbor&nbsp;Ave]
+    )
+    Low_Mean_Nearest_Neighbor_v2_Fz = CvtToFuzzy(
+        InFieldName = Frag_Nearest_Neighbor_v2_Ave,
+        FalseThreshold = 90,
+        TrueThreshold = 59,
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Mean&nbsp;Nearest&nbsp;Neighbor&nbsp;Fz,Description:Low&nbsp;Mean&nbsp;Nearest&nbsp;Neighbor&nbsp;Fz]
+    )
+    Frag_Num_Patches_v2_Ave = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Frag_Num_Patches_v2_Ave,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Frag&nbsp;Num&nbsp;Patches&nbsp;Ave,Description:Frag&nbsp;Num&nbsp;Patches&nbsp;Ave]
+    )
+    Low_Number_of_Patches_v2_Fz = CvtToFuzzy(
+        InFieldName = Frag_Num_Patches_v2_Ave,
+        FalseThreshold = 50,
+        TrueThreshold = 0,
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Number&nbsp;of&nbsp;Patches&nbsp;Fz,Description:Low&nbsp;Number&nbsp;of&nbsp;Patches&nbsp;Fz]
+    )
+    Frag_PctNatCore_v2_Ave = EEMSRead(
+        InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
+        InFieldName = Frag_PctNatCore_v2_Ave,
+        Metadata = [ColorMap:YlOrBr,DisplayName:Frag&nbsp;PctNatCore&nbsp;Ave,Description:Frag&nbsp;PctNatCore&nbsp;Ave]
+    )
+    High_Percent_Natural_Core_Area_v2_Fz = CvtToFuzzy(
+        InFieldName = Frag_PctNatCore_v2_Ave,
+        FalseThreshold = -10,
+        TrueThreshold = 90,
+        Metadata = [ColorMap:PiYG,DisplayName:High&nbsp;Percent&nbsp;Natural&nbsp;Core&nbsp;Area&nbsp;Fz,Description:High&nbsp;Percent&nbsp;Natural&nbsp;Core&nbsp;Area&nbsp;Fz]
+    )
+    Low_Natural_Habitat_Fragmentation_v2_WtedUnion_Fz = FuzzyWeightedUnion(
+        InFieldNames = [Low_Mean_Nearest_Neighbor_v2_Fz,Low_Number_of_Patches_v2_Fz,High_Percent_Natural_Core_Area_v2_Fz],
+        Weights = [1,1,1],
+        Metadata = [ColorMap:PiYG,DisplayName:Low&nbsp;Natural&nbsp;Habitat&nbsp;Fragmentation&nbsp;WtedUnion&nbsp;Fz,Description:Low&nbsp;Natural&nbsp;Habitat&nbsp;Fragmentation&nbsp;WtedUnion&nbsp;Fz]
+    )
+    Terrestrial_Landscape_Intactness_Updated_Frag_Fz = FuzzySelectedUnion(
+        InFieldNames = [Low_Permanent_Development_Fz,Low_Vegetation_State_Impacts_without_VegDeparture_Fz,Low_Natural_Habitat_Fragmentation_v2_WtedUnion_Fz],
+        TruestOrFalsest = Falsest,
+        NumberToConsider = 2,
+        Metadata = [ColorMap:PiYG,DisplayName:Terrestrial&nbsp;Landscape&nbsp;Intactness,Description:Terrestrial&nbsp;Landscape&nbsp;Intactness]
+    )
+  </div>
+  <div id="model" style="width: 800px; height: calc(100vh - 20px); border: 1px solid #eee;"></div>
+  <script>
+    mpilotUI.createDiagram('model', document.getElementById('ModelSource').innerHTML.trim())
+  </script>
+</body>
+</html>
