@@ -2,7 +2,13 @@ import { Program } from 'mpilot/lib'
 import ModelDiagram from './components/ModelDiagram.svelte'
 import type { DiagramMode } from './components/components'
 
-export const createDiagram = (node: string | HTMLElement, model: string, mode: DiagramMode = 'full') => {
+export interface DiagramOptions {
+  mode?: DiagramMode
+}
+
+export const createDiagram = (node: string | HTMLElement, model: string, options: DiagramOptions) => {
+  const { mode } = options
+
   let domNode: HTMLElement
   if (node instanceof HTMLElement) {
     domNode = node

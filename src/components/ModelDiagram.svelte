@@ -3,7 +3,7 @@
   import type { LayoutNode, DiagramMode, SelectEvent } from './components'
   import ModelTree from './ModelTree.svelte'
   import { NODE_SIZE } from './constants'
-  import { calculateOffset, getDependencyLookup, layoutTree } from './utils'
+  import { calculateOffset, getDependencyLookup, layoutTree, narrowTree } from './utils'
   import { tweened } from 'svelte/motion'
 
   // Props
@@ -13,12 +13,13 @@
   // State
   let prevProgram: Program
   let root: LayoutNode
+  let narrowRoot: LayoutNode
   let selected: LayoutNode | null
   let prevSelected: LayoutNode | null
-  let treeWidth: number
   let diagramNode: HTMLDivElement
   let containerNode: HTMLDivElement
   let diagramSize: { w: number; h: number }
+  let prevDiagramSize: { w: number; h: number }
   let diagramX = tweened(0)
   let diagramY = tweened(0)
   let isDragging = false
@@ -32,10 +33,11 @@
   }
 
   $: {
-    if (selected?.command.resultName !== prevSelected?.command.resultName) {
+    if (selected !== prevSelected || diagramSize !== prevDiagramSize) {
       prevSelected = selected
+      prevDiagramSize = diagramSize
 
-      if (selected) {
+      if (selected && diagramSize) {
         const offset = calculateOffset(selected)
 
         diagramX.set(offset.x + selected.pos + NODE_SIZE.w / 2 - diagramSize.w / 2)
@@ -52,16 +54,21 @@
       const rootCommands = Object.values(program.commands).filter(command => !dependents[command.resultName])
       if (rootCommands.length) {
         root = layoutTree(rootCommands[0], dependencies, program)
-        selected = prevSelected = root
 
-        const box = root.polygon.box
-        treeWidth = box.xmax - box.xmin
+        if (mode !== 'narrow') {
+          selected = root
+        }
       }
+    }
+  }
 
-      setTimeout(() => {
-        diagramX = tweened(root.offset.x + root.pos + NODE_SIZE.w / 2 - diagramSize.w / 2)
-        diagramY = tweened(-75)
-      }, 1)
+  $: {
+    if (root && diagramSize && mode === 'narrow') {
+      narrowRoot = narrowTree(root, diagramSize, selected || undefined)
+      console.log('narrowRoot', narrowRoot)
+      if (!selected) {
+        selected = narrowRoot
+      }
     }
   }
 
@@ -81,7 +88,9 @@
 
   const handlePointerMove = (e: PointerEvent) => {
     if (isDragging) {
-      diagramX = tweened($diagramX - e.movementX)
+      if (mode === 'full') {
+        diagramX = tweened($diagramX - e.movementX)
+      }
       diagramY = tweened($diagramY - e.movementY)
 
       if (Math.abs(e.x - dragStart!.x) > 5 || Math.abs(e.y - dragStart!.y) > 5) {
@@ -91,7 +100,9 @@
   }
 
   const handleWheel = (e: WheelEvent) => {
-    diagramX = tweened($diagramX + e.deltaX)
+    if (mode === 'full') {
+      diagramX = tweened($diagramX + e.deltaX)
+    }
     diagramY = tweened($diagramY + e.deltaY)
   }
 
@@ -113,7 +124,7 @@
 >
   <div class="mpilot-container" style={`left: ${-$diagramX}px; top: ${-$diagramY}px`} bind:this={containerNode}>
     {#if root}
-      <ModelTree {root} {selected} on:selected={handleSelected} />
+      <ModelTree root={narrowRoot || root} {selected} {diagramSize} {mode} on:selected={handleSelected} />
     {/if}
   </div>
 </div>

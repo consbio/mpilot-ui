@@ -109,12 +109,70 @@ export const layoutTree = (
     offset: { x: 0, y: yOffset },
     pos: rootPos,
     polygon,
-    expand: true,
+    collapsed: false,
   } as LayoutNode
 
   children.forEach(c => (c.parent = node))
 
   return node
+}
+
+export const narrowTree = (
+  root: LayoutNode,
+  diagramSize?: { w: number; h: number },
+  selected?: LayoutNode,
+  parent?: LayoutNode,
+) => {
+  if (!selected) {
+    selected = root
+  }
+
+  const newRoot = {
+    ...root,
+    children: [],
+    parent,
+  } as LayoutNode
+  const active = isChildOf(selected, root)
+
+  if (!root.children.length || (root.collapsed && !active && selected.command.resultName !== root.command.resultName)) {
+    newRoot.children = []
+  } else if (!diagramSize || root.polygon.box.xmax - root.polygon.box.xmin < diagramSize.w) {
+    newRoot.children = root.children.map(c => narrowTree(c, diagramSize, selected, newRoot))
+  } else if (
+    selected.command.resultName === root.command.resultName ||
+    root.children.length + NODE_SIZE.w + (root.children.length - 1) * NODE_SPACING.x < diagramSize.w
+  ) {
+    newRoot.children = root.children
+      .map(c => ({
+        ...c,
+        collapsed: true,
+        pos: 0,
+      }))
+      .map((c, i) => {
+        const narrow = narrowTree(c, diagramSize, selected, newRoot)
+        return Object.assign(narrow, {
+          ...narrow,
+          collapsed: true,
+          offset: { x: i * (NODE_SIZE.w + NODE_SPACING.x) - narrow.pos, y: c.offset.y },
+        })
+      })
+  } else if (active) {
+    newRoot.children = root.children
+      .filter(c => isChildOf(c, selected!))
+      .map(c => ({ ...c, collapsed: false, offset: { x: 0, y: c.offset.y } }))
+      .map(c => narrowTree(c, diagramSize, selected, newRoot))
+  }
+
+  if (newRoot.children.length) {
+    const firstChild = newRoot.children[0]
+    const lastChild = newRoot.children[newRoot.children.length - 1]
+    const start = firstChild.offset.x + firstChild.pos
+    const end = lastChild.offset.x + lastChild.pos + NODE_SIZE.w
+
+    newRoot.pos = start + (end - start) / 2 - NODE_SIZE.w / 2
+  }
+
+  return newRoot
 }
 
 export const getDependencyLookup = (program: Program) => {

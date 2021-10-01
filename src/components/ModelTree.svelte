@@ -1,9 +1,11 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
+  import { scale } from 'svelte/transition'
   import type { LayoutNode, SelectEvent } from './components'
   import CommandNode from './CommandNode.svelte'
   import ModelTree from './ModelTree.svelte'
   import { NODE_SIZE, NODE_SPACING } from './constants'
+  import { isChildOf } from './utils'
 
   const dispatch = createEventDispatcher()
 
@@ -11,10 +13,10 @@
   export let root: LayoutNode
   export let selected: LayoutNode
   export let offset: [number, number] = [0, 0]
-  export let connectorLine: { left: number; top: number; length: number }
 
   // State
-  export let active = false
+  let active = false
+  let connectorLine: { left: number; top: number; length: number }
 
   $: {
     if (root?.children.length) {
@@ -30,25 +32,10 @@
     }
   }
 
-  $: active = isInSelectedPath(selected)
+  $: active = selected ? isChildOf(selected, root) : false
 
   const handleClick = () => {
     dispatch('selected', { node: root } as SelectEvent)
-  }
-
-  const isInSelectedPath = selected => {
-    if (!(root && selected)) {
-      return false
-    }
-
-    let parent = selected.parent
-    while (parent) {
-      if (parent.command.resultName === root.command.resultName) {
-        return true
-      }
-      parent = parent.parent
-    }
-    return false
   }
 </script>
 
@@ -68,6 +55,7 @@
       style={`left: ${offset[0] + child.offset.x + child.pos + NODE_SIZE.w / 2}px; top: ${
         offset[1] + NODE_SIZE.h + NODE_SPACING.y / 2
       }px`}
+      transition:scale
     />
     <ModelTree
       root={child}
@@ -81,10 +69,12 @@
     <div
       class="mpilot-vertical-line"
       style={`left: ${offset[0] + root.pos + NODE_SIZE.w / 2}px; top: ${offset[1] + NODE_SIZE.h + 1}px`}
+      transition:scale
     />
     <div
       class="mpilot-horizontal-line"
       style={`left: ${connectorLine.left}px; top: ${connectorLine.top}px; width: ${connectorLine.length}px`}
+      transition:scale
     />
   {/if}
 {/if}

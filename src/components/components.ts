@@ -10,7 +10,7 @@ export interface LayoutNode {
   offset: { x: number; y: number }
   pos: number
   polygon: Polygon
-  expand: boolean
+  collapsed: boolean
 }
 
 export type DiagramMode = 'full' | 'narrow'

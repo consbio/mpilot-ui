@@ -7,7 +7,7 @@
   <script src="../dist/mpilot-ui.bundle.js"></script>
   <link rel='stylesheet' href='../dist/mpilot-ui.bundle.css'>
 </head>
-<body>
+<body style="background-color: black">
   <div id="ModelSource" style="display: none;">
     Urban_Development_Density = EEMSRead(
         InFileName = /home/mike/apps/eems-online/eems_online_project/eems_online_app/static/eems/models/13/data/4_ca_ti_eems_output_1km.nc,
@@ -270,9 +270,9 @@
         Metadata = [ColorMap:PiYG,DisplayName:Terrestrial&nbsp;Landscape&nbsp;Intactness,Description:Terrestrial&nbsp;Landscape&nbsp;Intactness]
     )
   </div>
-  <div id="model" style="width: 800px; height: calc(100vh - 20px); border: 1px solid #eee;"></div>
+  <div id="model" style="width: 600px; height: calc(100vh - 20px); border: 1px solid #eee;"></div>
   <script>
-    mpilotUI.createDiagram('model', document.getElementById('ModelSource').innerHTML.trim())
+    mpilotUI.createDiagram('model', document.getElementById('ModelSource').innerHTML.trim(), {mode: 'narrow'})
   </script>
 </body>
 </html>

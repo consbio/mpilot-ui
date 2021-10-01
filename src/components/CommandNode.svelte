@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { scale } from 'svelte/transition'
   import type { BaseCommand } from 'mpilot/lib/commands'
   import { NODE_SIZE } from './constants'
 
@@ -26,6 +27,7 @@
   class:mpilot-active={active}
   style={`width: ${NODE_SIZE.w}px; height: ${NODE_SIZE.h}px; left: ${left}px; top: ${top}px;`}
   role="button"
+  transition:scale
   on:click
 >
   <div class="mpilot-title">{displayName}</div>
