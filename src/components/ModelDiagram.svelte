@@ -1,19 +1,25 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte'
   import { Program } from 'mpilot/lib'
   import type { LayoutNode, DiagramMode, SelectEvent } from './components'
   import ModelTree from './ModelTree.svelte'
-  import { NODE_SIZE } from './constants'
-  import { calculateOffset, getDependencyLookup, layoutTree, narrowTree } from './utils'
+  import ScaleControl from './ScaleControl.svelte'
+  import { NODE_SIZE, NODE_SPACING } from './constants'
+  import { calculateHeight, calculateOffset, getDependencyLookup, layoutTree, narrowTree } from './utils'
   import { tweened } from 'svelte/motion'
+
+  const dispatch = createEventDispatcher()
 
   // Props
   export let program: Program
   export let mode: DiagramMode = 'full'
+  export let scale: number = 1
 
   // State
   let prevProgram: Program
   let root: LayoutNode
-  let narrowRoot: LayoutNode
+  let treeHeight: number
+  let narrowRoot: LayoutNode | null
   let selected: LayoutNode | null
   let prevSelected: LayoutNode | null
   let diagramNode: HTMLDivElement
@@ -25,6 +31,18 @@
   let isDragging = false
   let dragStart: { x: number; y: number } | null = null
   let disableSelect = false
+
+  let repositionTimeout = null
+
+  $: {
+    if (mode === 'full') {
+      narrowRoot = null
+
+      if (root) {
+        treeHeight = calculateHeight(root) * scale
+      }
+    }
+  }
 
   $: {
     if (diagramNode) {
@@ -40,8 +58,9 @@
       if (selected && diagramSize) {
         const offset = calculateOffset(selected)
 
-        diagramX.set(offset.x + selected.pos + NODE_SIZE.w / 2 - diagramSize.w / 2)
-        diagramY.set(offset.y - diagramSize.h / 4 + NODE_SIZE.h / 2)
+        clearTimeout(repositionTimeout)
+        diagramX.set((offset.x + selected.pos + NODE_SIZE.w / 2 - diagramSize.w / scale / 2) * scale)
+        diagramY.set((offset.y - NODE_SIZE.h - NODE_SPACING.y) * scale)
       }
     }
   }
@@ -57,6 +76,7 @@
 
         if (mode !== 'narrow') {
           selected = root
+          treeHeight = calculateHeight(root) * scale
         }
       }
     }
@@ -64,11 +84,36 @@
 
   $: {
     if (root && diagramSize && mode === 'narrow') {
-      narrowRoot = narrowTree(root, diagramSize, selected || undefined)
-      console.log('narrowRoot', narrowRoot)
+      narrowRoot = narrowTree(root, { w: diagramSize.w / scale, h: diagramSize / scale }, selected || undefined)
+      treeHeight = calculateHeight(narrowRoot)
       if (!selected) {
         selected = narrowRoot
       }
+    }
+  }
+
+  const repositionX = () => {
+    if (!selected || !diagramSize) {
+      return
+    }
+
+    let node = selected
+    while (node.parent && node.parent.offset.y * scale > $diagramY + NODE_SIZE.h + NODE_SPACING.y) {
+      node = node.parent
+    }
+
+    const offset = calculateOffset(node)
+    diagramX.set((offset.x + node.pos + NODE_SIZE.w / 2 - diagramSize.w / scale / 2) * scale)
+  }
+
+  const moveView = (dx: number, dy: number) => {
+    diagramY = tweened(Math.min(Math.max($diagramY + dy, -(NODE_SIZE.h * 2)), treeHeight - NODE_SIZE.h))
+
+    if (mode === 'full') {
+      diagramX = tweened($diagramX + dx)
+    } else {
+      clearTimeout(repositionTimeout)
+      repositionTimeout = setTimeout(repositionX, 100)
     }
   }
 
@@ -88,27 +133,18 @@
 
   const handlePointerMove = (e: PointerEvent) => {
     if (isDragging) {
-      if (mode === 'full') {
-        diagramX = tweened($diagramX - e.movementX)
-      }
-      diagramY = tweened($diagramY - e.movementY)
-
-      if (Math.abs(e.x - dragStart!.x) > 5 || Math.abs(e.y - dragStart!.y) > 5) {
-        disableSelect = true
-      }
+      moveView(-e.movementX, -e.movementY)
     }
   }
 
   const handleWheel = (e: WheelEvent) => {
-    if (mode === 'full') {
-      diagramX = tweened($diagramX + e.deltaX)
-    }
-    diagramY = tweened($diagramY + e.deltaY)
+    moveView(e.deltaX, e.deltaY)
   }
 
   const handleSelected = (e: CustomEvent<SelectEvent>) => {
     if (!disableSelect) {
       selected = e.detail.node
+      dispatch('selected', e.detail)
     }
   }
 </script>
@@ -122,9 +158,14 @@
   on:pointermove={handlePointerMove}
   on:wheel={handleWheel}
 >
-  <div class="mpilot-container" style={`left: ${-$diagramX}px; top: ${-$diagramY}px`} bind:this={containerNode}>
+  <ScaleControl bind:scale />
+  <div
+    class="mpilot-container"
+    style={`transform: scale(${scale}, ${scale}); left: ${-$diagramX}px; top: ${-$diagramY}px`}
+    bind:this={containerNode}
+  >
     {#if root}
-      <ModelTree root={narrowRoot || root} {selected} {diagramSize} {mode} on:selected={handleSelected} />
+      <ModelTree root={narrowRoot || root} {selected} on:selected={handleSelected} />
     {/if}
   </div>
 </div>
@@ -147,5 +188,7 @@
 
   .mpilot-diagram .mpilot-container {
     position: absolute;
+    transform-origin: 50% 50%;
+    transition: transform 0.5s;
   }
 </style>

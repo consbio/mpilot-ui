@@ -6,6 +6,26 @@ export interface DiagramOptions {
   mode?: DiagramMode
 }
 
+class DiagramWrapper {
+  diagram: ModelDiagram
+  target: Element
+
+  constructor(diagram: ModelDiagram, target: Element) {
+    this.diagram = diagram
+    this.target = target
+
+    this.diagram.$on('selected', e => this.target.dispatchEvent(e))
+  }
+
+  addEventListener() {
+    this.target.addEventListener.apply(this.target, arguments as any)
+  }
+
+  removeEventListener() {
+    this.target.removeEventListener.apply(this.target, arguments as any)
+  }
+}
+
 export const createDiagram = (node: string | HTMLElement, model: string, options: DiagramOptions) => {
   const { mode } = options
 
@@ -22,6 +42,7 @@ export const createDiagram = (node: string | HTMLElement, model: string, options
   }
 
   const program = Program.fromSource(model)
+  const diagram = new ModelDiagram({ target: domNode, props: { program, mode } })
 
-  return new ModelDiagram({ target: domNode, props: { program, mode } })
+  return new DiagramWrapper(diagram, domNode)
 }

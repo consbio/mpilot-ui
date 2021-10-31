@@ -27,7 +27,9 @@
   class:mpilot-active={active}
   style={`width: ${NODE_SIZE.w}px; height: ${NODE_SIZE.h}px; left: ${left}px; top: ${top}px;`}
   role="button"
+  title={displayName}
   transition:scale
+  on:pointerdown={e => e.stopPropagation()}
   on:click
 >
   <div class="mpilot-title">{displayName}</div>

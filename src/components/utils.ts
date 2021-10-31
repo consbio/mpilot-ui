@@ -152,7 +152,7 @@ export const narrowTree = (
         const narrow = narrowTree(c, diagramSize, selected, newRoot)
         return Object.assign(narrow, {
           ...narrow,
-          collapsed: true,
+          collapsed: c.children.length > 0 && !(selected && isChildOf(selected, c)),
           offset: { x: i * (NODE_SIZE.w + NODE_SPACING.x) - narrow.pos, y: c.offset.y },
         })
       })
@@ -223,6 +223,13 @@ export const calculateOffset = (node: LayoutNode): { x: number; y: number } => {
     x: parentOffset.x + node.offset.x,
     y: node.offset.y,
   }
+}
+
+export const calculateHeight = (node: LayoutNode): number => {
+  if (!node.children.length) {
+    return NODE_SIZE.h
+  }
+  return Math.max(...node.children.map(c => calculateHeight(c))) + NODE_SIZE.h + NODE_SPACING.y
 }
 
 export const collapseTree = (root: LayoutNode, width: number, selected: LayoutNode) => {}

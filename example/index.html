@@ -272,7 +272,8 @@
   </div>
   <div id="model" style="width: 600px; height: calc(100vh - 20px); border: 1px solid #eee;"></div>
   <script>
-    mpilotUI.createDiagram('model', document.getElementById('ModelSource').innerHTML.trim(), {mode: 'narrow'})
+    const diagram = mpilotUI.createDiagram('model', document.getElementById('ModelSource').innerHTML.trim(), {mode: 'narrow'})
+    diagram.addEventListener('selected', e => console.log('selected', e.detail.node))
   </script>
 </body>
 </html>
