@@ -24,6 +24,19 @@ class DiagramWrapper {
   removeEventListener() {
     this.target.removeEventListener.apply(this.target, arguments as any)
   }
+
+  setModel(model: string) {
+    const program = Program.fromSource(model)
+    this.diagram.$set({ program })
+  }
+
+  setOptions(options: DiagramOptions) {
+    this.diagram.$set({ ...options })
+  }
+
+  update() {
+    this.diagram.$$.update()
+  }
 }
 
 export const createDiagram = (node: string | HTMLElement, model: string, options: DiagramOptions) => {

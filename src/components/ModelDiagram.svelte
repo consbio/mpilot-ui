@@ -25,6 +25,7 @@
 
   // State
   let prevProgram: Program
+  let prevMode: DiagramMode = mode
 
   let root: LayoutNode
   let narrowRoot: LayoutNode | null
@@ -36,6 +37,7 @@
   let appliedScale = tweened(1)
 
   let diagramSize: { w: number; h: number }
+  let prevDiagramSize: { w: number; h: number }
   let diagramX = tweened(0)
   let diagramY = tweened(0)
 
@@ -58,12 +60,24 @@
         treeHeight = calculateHeight(root) * scale
         treeWidth = calculateWidth(root) * scale
       }
+
+      if (mode !== prevMode) {
+        prevMode = mode
+        selected = root
+      }
     }
   }
 
   $: {
-    if (diagramNode) {
+    if (diagramNode && (diagramNode.offsetWidth !== diagramSize?.w || diagramNode.offsetHeight !== diagramSize?.h)) {
       diagramSize = { w: diagramNode.offsetWidth, h: diagramNode.offsetHeight }
+    }
+  }
+
+  $: {
+    if (prevDiagramSize !== diagramSize) {
+      prevDiagramSize = diagramSize
+      centerOn(selected || undefined)
     }
   }
 
@@ -109,6 +123,7 @@
       const rootCommands = Object.values(program.commands).filter(command => !dependents[command.resultName])
       if (rootCommands.length) {
         root = layoutTree(rootCommands[0], dependencies, program)
+        selected = null
 
         if (mode !== 'narrow') {
           selected = root
@@ -122,6 +137,11 @@
 
   $: {
     if (root && diagramSize && mode === 'narrow') {
+      if (mode !== prevMode) {
+        prevMode = mode
+        selected = null
+      }
+
       narrowRoot = narrowTree(root, { w: diagramSize.w / scale, h: diagramSize / scale }, selected || undefined)
       treeHeight = calculateHeight(narrowRoot)
       treeWidth = calculateWidth(narrowRoot)

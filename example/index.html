@@ -6,6 +6,27 @@
 
   <script src="../dist/mpilot-ui.bundle.js"></script>
   <link rel='stylesheet' href='../dist/mpilot-ui.bundle.css'>
+
+  <style>
+    .container {
+      display: flex;
+      color: white;
+    }
+
+    #model {
+      flex-grow: 0;
+    }
+
+    .drag {
+      flex-grow: 0;
+      width: 10px;
+      cursor: ew-resize;
+    }
+
+    .config {
+      padding-left: 10px;
+    }
+  </style>
 </head>
 <body style="background-color: black">
   <div id="ModelSource" style="display: none;">
@@ -270,10 +291,53 @@
         Metadata = [ColorMap:PiYG,DisplayName:Terrestrial&nbsp;Landscape&nbsp;Intactness,Description:Terrestrial&nbsp;Landscape&nbsp;Intactness]
     )
   </div>
-  <div id="model" style="width: 600px; height: calc(100vh - 20px); border: 1px solid #eee;"></div>
+  <div id="Model2Source" style="display: none">
+    Score = Sum(InFieldNames=[A, B])
+    A = EEMSRead(InFileName=data.csv, InFieldName=A)
+    B = EEMSRead(InFileName=data.csv, InFieldName=B)
+  </div>
+  <div class="container">
+    <div id="model" style="width: 600px; height: calc(100vh - 20px); border: 1px solid #eee;"></div>
+    <div
+      id="drag"
+      class="drag">
+    </div>
+    <div class="config">
+      <h2>Mode</h2>
+      <div><label><input type="radio" name="mode" value="narrow" checked onClick="setNarrow()"> Narrow</label></div>
+      <div><label><input type="radio" name="mode" value="narrow" onClick="setFull()"> Full</label></div>
+    </div>
+  </div>
   <script>
-    const diagram = mpilotUI.createDiagram('model', document.getElementById('ModelSource').innerHTML.trim(), {mode: 'full'})
+    const diagram = mpilotUI.createDiagram('model', document.getElementById('ModelSource').innerHTML.trim(), {mode: 'narrow'})
     diagram.addEventListener('selected', e => console.log('selected', e.detail.node))
+
+    let width = 600
+    let isDragging = false
+
+    function setNarrow() {
+      diagram.setOptions({mode: 'narrow'})
+    }
+    function setFull() {
+      diagram.setOptions({mode: 'full'})
+    }
+
+    const dragElement = document.getElementById('drag')
+    dragElement.addEventListener('pointerdown', e => {
+      isDragging = true
+      e.target.setPointerCapture(e.pointerId)
+    })
+    dragElement.addEventListener('pointerup', e => {
+      isDragging = false
+      e.target.releasePointerCapture(e.pointerId)
+    })
+    dragElement.addEventListener('pointermove', e => {
+      if (isDragging) {
+        width = Math.min(Math.max(width + e.movementX, 600), 1200)
+        document.getElementById('model').style.width = width + 'px'
+        diagram.update()
+      }
+    })
   </script>
 </body>
 </html>
