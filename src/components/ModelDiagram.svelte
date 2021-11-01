@@ -163,7 +163,7 @@
 
       clearTimeout(repositionTimeout)
       diagramX.set((offset.x + node.pos + NODE_SIZE.w / 2 - diagramSize.w / scale / 2) * scale)
-      diagramY.set(offset.y + NODE_SIZE.h / 2 - (diagramSize.h / scale) * 0.3 * scale)
+      diagramY.set((offset.y + NODE_SIZE.h / 2 - (diagramSize.h / scale) * 0.3) * scale)
     }
   }
 
@@ -173,7 +173,7 @@
     }
 
     let node = selected
-    while (node.parent && node.parent.offset.y / scale + NODE_SIZE.h / 2 > $diagramY + (diagramSize.h / scale) * 0.3) {
+    while (node.parent && node.parent.offset.y + NODE_SIZE.h / 2 > $diagramY / scale + (diagramSize.h / scale) * 0.3) {
       node = node.parent
     }
 
