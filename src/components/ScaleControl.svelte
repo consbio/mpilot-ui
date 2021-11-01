@@ -1,6 +1,6 @@
 <script lang="ts">
   export let scale: number = 1
-  export let scales: number[] = [1, 0.9, 0.8, 0.7, 0.6, 0.5]
+  export let scales: number[] = [1, 0.8, 0.6, 0.5, 0.4]
 
   // State
   let scaleIdx: number

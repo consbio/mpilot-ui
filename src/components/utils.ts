@@ -4,7 +4,7 @@ import { ResultParameter, AnyParameter } from 'mpilot/lib/params'
 import { NODE_SIZE, NODE_SPACING } from './constants'
 
 // eslint-disable-next-line import/no-unresolved
-import type { LayoutNode } from './components'
+import type { LayoutNode, GroupedNodes } from './components'
 
 // @ts-ignore
 import { Polygon, Box, Vector, BooleanOperations } from '@flatten-js/core'
@@ -37,6 +37,21 @@ export const isChildOf = (child: LayoutNode, parent: LayoutNode): boolean => {
   }
 
   return parent.children.some(c => isChildOf(child, c))
+}
+
+export const findNode = (root: LayoutNode, node: LayoutNode): LayoutNode | null => {
+  if (root.command.resultName === node.command.resultName) {
+    return root
+  }
+
+  for (let i = 0; i < root.children.length; i += 1) {
+    const result = findNode(root.children[i], node)
+    if (result) {
+      return result
+    }
+  }
+
+  return null
 }
 
 export const layoutTree = (
@@ -123,6 +138,10 @@ export const narrowTree = (
   selected?: LayoutNode,
   parent?: LayoutNode,
 ) => {
+  if (!diagramSize) {
+    return root
+  }
+
   if (!selected) {
     selected = root
   }
@@ -132,35 +151,77 @@ export const narrowTree = (
     children: [],
     parent,
   } as LayoutNode
-  const active = isChildOf(selected, root)
 
-  if (!root.children.length || (root.collapsed && !active && selected.command.resultName !== root.command.resultName)) {
-    newRoot.children = []
-  } else if (!diagramSize || root.polygon.box.xmax - root.polygon.box.xmin < diagramSize.w) {
-    newRoot.children = root.children.map(c => narrowTree(c, diagramSize, selected, newRoot))
-  } else if (
-    selected.command.resultName === root.command.resultName ||
-    root.children.length + NODE_SIZE.w + (root.children.length - 1) * NODE_SPACING.x < diagramSize.w
+  const isSelected = selected.command.resultName === root.command.resultName
+  const isActive = !isSelected && isChildOf(selected, root)
+  const canFit = root.polygon.box.xmax - root.polygon.box.xmin < diagramSize.w
+  const canFitCollapsed =
+    root.children.length * NODE_SIZE.w + (root.children.length - 1) * NODE_SPACING.x < diagramSize.w
+
+  if (
+    !root.children.length ||
+    (root.collapsed && !isActive && selected.command.resultName !== root.command.resultName)
   ) {
-    newRoot.children = root.children
-      .map(c => ({
-        ...c,
-        collapsed: true,
+    newRoot.children = []
+  } else if (canFit) {
+    newRoot.children = root.children.map(c => narrowTree(c, diagramSize, selected, newRoot))
+  } else if (isSelected || isActive || canFitCollapsed) {
+    newRoot.children = root.children.map(c => ({
+      ...c,
+      collapsed: true,
+      pos: 0,
+    }))
+
+    if (!canFitCollapsed) {
+      const numCanFit = Math.max(1, Math.floor(diagramSize.w / (NODE_SIZE.w + NODE_SPACING.x)) - 1)
+      const grouped = {
+        command: new BaseCommand('', [], newRoot.command.program, 0),
+        parent: newRoot,
+        children: [],
+        offset: { x: 0, y: newRoot.offset.y + NODE_SIZE.h + NODE_SPACING.y },
         pos: 0,
-      }))
-      .map((c, i) => {
-        const narrow = narrowTree(c, diagramSize, selected, newRoot)
-        return Object.assign(narrow, {
-          ...narrow,
-          collapsed: c.children.length > 0 && !(selected && isChildOf(selected, c)),
-          offset: { x: i * (NODE_SIZE.w + NODE_SPACING.x) - narrow.pos, y: c.offset.y },
-        })
+        polygon: new Polygon(new Box(0, 0, NODE_SIZE.w, NODE_SIZE.h)),
+        collapsed: true,
+        nodes: [],
+      } as GroupedNodes
+
+      if (isActive) {
+        const idx = newRoot.children.findIndex(c => isChildOf(selected!, c))
+
+        const before: LayoutNode[] = []
+        const after: LayoutNode[] = []
+        for (let i = 0; i < numCanFit - 1; i += 1) {
+          const beforeIdx = idx - before.length - 1
+          const afterIdx = idx + after.length + 1
+
+          if ((before.length <= after.length || afterIdx >= newRoot.children.length) && beforeIdx >= 0) {
+            before.push(newRoot.children[beforeIdx])
+          } else if (afterIdx < newRoot.children.length) {
+            after.push(newRoot.children[afterIdx])
+          } else {
+            break
+          }
+        }
+
+        grouped.nodes = [
+          ...newRoot.children.slice(0, idx - before.length),
+          ...newRoot.children.slice(idx + after.length + 1),
+        ]
+        newRoot.children = [...before, newRoot.children[idx], ...after, grouped]
+      } else {
+        grouped.nodes = newRoot.children.slice(numCanFit)
+        newRoot.children = [...newRoot.children.slice(0, numCanFit), grouped]
+      }
+    }
+
+    newRoot.children = newRoot.children.map((c, i) => {
+      const narrow = narrowTree(c, diagramSize, selected, newRoot)
+      return Object.assign(narrow, {
+        ...narrow,
+        collapsed: c.children.length > 0 && !(selected && isChildOf(selected, c)),
+        offset: { x: i * (NODE_SIZE.w + NODE_SPACING.x) - narrow.pos, y: c.offset.y },
       })
-  } else if (active) {
-    newRoot.children = root.children
-      .filter(c => isChildOf(c, selected!))
-      .map(c => ({ ...c, collapsed: false, offset: { x: 0, y: c.offset.y } }))
-      .map(c => narrowTree(c, diagramSize, selected, newRoot))
+    })
   }
 
   if (newRoot.children.length) {
@@ -232,4 +293,22 @@ export const calculateHeight = (node: LayoutNode): number => {
   return Math.max(...node.children.map(c => calculateHeight(c))) + NODE_SIZE.h + NODE_SPACING.y
 }
 
-export const collapseTree = (root: LayoutNode, width: number, selected: LayoutNode) => {}
+export const calculateWidth = (node: LayoutNode): number => {
+  const findLeftEdge = (n: LayoutNode): number => {
+    if (!n.children.length) {
+      return 0
+    }
+    const leftChild = n.children[0]
+    return findLeftEdge(leftChild) - n.pos + leftChild.pos
+  }
+
+  const findRightEdge = (n: LayoutNode): number => {
+    if (!n.children.length) {
+      return NODE_SIZE.w
+    }
+    const rightChild = n.children[n.children.length - 1]
+    return findRightEdge(rightChild) + rightChild.offset.x + rightChild.pos - n.pos
+  }
+
+  return findRightEdge(node) - findLeftEdge(node)
+}

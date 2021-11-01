@@ -16,25 +16,27 @@
   $: {
     if (command) {
       const metadata = command.getMetadata()
-      displayName = metadata?.DisplayName?.replaceAll('&nbsp;', ' ')?.replaceAll('+', ' ') || command.resultName
+      displayName = (metadata?.DisplayName || '').replaceAll('&nbsp;', ' ').replaceAll('+', ' ') || command.resultName
     }
   }
 </script>
 
-<div
-  class="mpilot-node"
-  class:mpilot-selected={selected}
-  class:mpilot-active={active}
-  style={`width: ${NODE_SIZE.w}px; height: ${NODE_SIZE.h}px; left: ${left}px; top: ${top}px;`}
-  role="button"
-  title={displayName}
-  transition:scale
-  on:pointerdown={e => e.stopPropagation()}
-  on:click
->
-  <div class="mpilot-title">{displayName}</div>
-  <div class="mpilot-node-name">{command.displayName}</div>
-</div>
+{#key command.resultName}
+  <div
+    class="mpilot-node"
+    class:mpilot-selected={selected}
+    class:mpilot-active={active}
+    style={`width: ${NODE_SIZE.w}px; height: ${NODE_SIZE.h}px; left: ${left}px; top: ${top}px;`}
+    role="button"
+    title={displayName}
+    transition:scale
+    on:pointerdown={e => e.stopPropagation()}
+    on:click
+  >
+    <div class="mpilot-title">{displayName}</div>
+    <div class="mpilot-node-name">{command.displayName}</div>
+  </div>
+{/key}
 
 <style>
   .mpilot-node {

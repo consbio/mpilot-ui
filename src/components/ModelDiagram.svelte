@@ -4,8 +4,16 @@
   import type { LayoutNode, DiagramMode, SelectEvent } from './components'
   import ModelTree from './ModelTree.svelte'
   import ScaleControl from './ScaleControl.svelte'
-  import { NODE_SIZE, NODE_SPACING } from './constants'
-  import { calculateHeight, calculateOffset, getDependencyLookup, layoutTree, narrowTree } from './utils'
+  import { NODE_SIZE } from './constants'
+  import {
+    calculateHeight,
+    calculateOffset,
+    calculateWidth,
+    findNode,
+    getDependencyLookup,
+    layoutTree,
+    narrowTree,
+  } from './utils'
   import { tweened } from 'svelte/motion'
 
   const dispatch = createEventDispatcher()
@@ -17,20 +25,28 @@
 
   // State
   let prevProgram: Program
+
   let root: LayoutNode
-  let treeHeight: number
   let narrowRoot: LayoutNode | null
+
   let selected: LayoutNode | null
   let prevSelected: LayoutNode | null
-  let diagramNode: HTMLDivElement
-  let containerNode: HTMLDivElement
+
+  let prevScale: number
+  let appliedScale = tweened(1)
+
   let diagramSize: { w: number; h: number }
-  let prevDiagramSize: { w: number; h: number }
   let diagramX = tweened(0)
   let diagramY = tweened(0)
+
   let isDragging = false
   let dragStart: { x: number; y: number } | null = null
   let disableSelect = false
+
+  let treeHeight: number
+  let treeWidth: number
+  let diagramNode: HTMLDivElement
+  let containerNode: HTMLDivElement
 
   let repositionTimeout = null
 
@@ -40,6 +56,7 @@
 
       if (root) {
         treeHeight = calculateHeight(root) * scale
+        treeWidth = calculateWidth(root) * scale
       }
     }
   }
@@ -51,17 +68,36 @@
   }
 
   $: {
-    if (selected !== prevSelected || diagramSize !== prevDiagramSize) {
+    if (selected !== prevSelected && mode === 'full') {
       prevSelected = selected
-      prevDiagramSize = diagramSize
+      centerOn(selected || undefined)
+    }
+  }
 
-      if (selected && diagramSize) {
-        const offset = calculateOffset(selected)
+  $: appliedScale.set(scale)
 
-        clearTimeout(repositionTimeout)
-        diagramX.set((offset.x + selected.pos + NODE_SIZE.w / 2 - diagramSize.w / scale / 2) * scale)
-        diagramY.set((offset.y - NODE_SIZE.h - NODE_SPACING.y) * scale)
+  $: {
+    if ($appliedScale !== prevScale) {
+      if (prevScale) {
+        const scaledMid = {
+          x: $diagramX / prevScale + diagramSize.w / prevScale / 2,
+          y: $diagramY / prevScale + diagramSize.h / prevScale / 2,
+        }
+
+        const scaledPos = {
+          x: scaledMid.x - diagramSize.w / $appliedScale / 2,
+          y: scaledMid.y - diagramSize.h / $appliedScale / 2,
+        }
+
+        const realPos = {
+          x: scaledPos.x * $appliedScale,
+          y: scaledPos.y * $appliedScale,
+        }
+
+        diagramX = tweened(realPos.x)
       }
+
+      prevScale = $appliedScale
     }
   }
 
@@ -77,6 +113,8 @@
         if (mode !== 'narrow') {
           selected = root
           treeHeight = calculateHeight(root) * scale
+          treeWidth = calculateWidth(root) * scale
+          setTimeout(() => centerOn(root), 10)
         }
       }
     }
@@ -86,9 +124,25 @@
     if (root && diagramSize && mode === 'narrow') {
       narrowRoot = narrowTree(root, { w: diagramSize.w / scale, h: diagramSize / scale }, selected || undefined)
       treeHeight = calculateHeight(narrowRoot)
+      treeWidth = calculateWidth(narrowRoot)
+
       if (!selected) {
-        selected = narrowRoot
+        selected = prevSelected = narrowRoot
+        centerOn(selected)
+      } else if (selected !== prevSelected) {
+        selected = prevSelected = findNode(narrowRoot, selected)
+        centerOn(selected || undefined)
       }
+    }
+  }
+
+  const centerOn = (node?: LayoutNode) => {
+    if (node && diagramSize) {
+      const offset = calculateOffset(node)
+
+      clearTimeout(repositionTimeout)
+      diagramX.set((offset.x + node.pos + NODE_SIZE.w / 2 - diagramSize.w / scale / 2) * scale)
+      diagramY.set(offset.y + NODE_SIZE.h / 2 - (diagramSize.h / scale) * 0.3 * scale)
     }
   }
 
@@ -98,7 +152,7 @@
     }
 
     let node = selected
-    while (node.parent && node.parent.offset.y * scale > $diagramY + NODE_SIZE.h + NODE_SPACING.y) {
+    while (node.parent && node.parent.offset.y / scale + NODE_SIZE.h / 2 > $diagramY + (diagramSize.h / scale) * 0.3) {
       node = node.parent
     }
 
@@ -107,10 +161,12 @@
   }
 
   const moveView = (dx: number, dy: number) => {
-    diagramY = tweened(Math.min(Math.max($diagramY + dy, -(NODE_SIZE.h * 2)), treeHeight - NODE_SIZE.h))
+    diagramY = tweened(
+      Math.min(Math.max($diagramY + dy, -(diagramSize.h * 0.3)), treeHeight * scale - diagramSize.h * 0.3),
+    )
 
     if (mode === 'full') {
-      diagramX = tweened($diagramX + dx)
+      diagramX = tweened(Math.min(Math.max($diagramX + dx, -(diagramSize.w * 0.7)), treeWidth - diagramSize.w * 0.3))
     } else {
       clearTimeout(repositionTimeout)
       repositionTimeout = setTimeout(repositionX, 100)
@@ -152,6 +208,7 @@
 <div
   class="mpilot-diagram"
   class:mpilot-dragging={isDragging}
+  class:mpilot-narrow-layout={mode === 'narrow'}
   bind:this={diagramNode}
   on:pointerdown={handlePointerDown}
   on:pointerup={handlePointerUp}
@@ -159,9 +216,10 @@
   on:wheel={handleWheel}
 >
   <ScaleControl bind:scale />
+  <div class="mpilot-container-stripe" style={`transform: scale(1, ${$appliedScale}); top: calc(30%);`} />
   <div
     class="mpilot-container"
-    style={`transform: scale(${scale}, ${scale}); left: ${-$diagramX}px; top: ${-$diagramY}px`}
+    style={`transform: scale(${$appliedScale}, ${$appliedScale}); left: ${-$diagramX}px; top: ${-$diagramY}px`}
     bind:this={containerNode}
   >
     {#if root}
@@ -178,8 +236,23 @@
     max-width: 100%;
     max-height: 100%;
     overflow: hidden;
-    background-color: white;
+    background: white;
     cursor: pointer;
+  }
+
+  .mpilot-container-stripe {
+    display: none;
+  }
+
+  .mpilot-diagram.mpilot-narrow-layout .mpilot-container-stripe {
+    display: block;
+    position: absolute;
+    height: 90px;
+    width: 100%;
+    top: 30%;
+    left: 0;
+    background: #efefef;
+    transform-origin: top;
   }
 
   .mpilot-diagram.mpilot-dragging {
@@ -189,6 +262,5 @@
   .mpilot-diagram .mpilot-container {
     position: absolute;
     transform-origin: 50% 50%;
-    transition: transform 0.5s;
   }
 </style>

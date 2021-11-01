@@ -13,6 +13,10 @@ export interface LayoutNode {
   collapsed: boolean
 }
 
+export type GroupedNodes = LayoutNode & {
+  nodes: LayoutNode[]
+}
+
 export type DiagramMode = 'full' | 'narrow'
 
 export interface SelectEvent {

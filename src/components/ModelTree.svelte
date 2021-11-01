@@ -1,16 +1,17 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { scale } from 'svelte/transition'
-  import type { LayoutNode, SelectEvent } from './components'
+  import type { LayoutNode, GroupedNodes, SelectEvent } from './components'
   import CommandNode from './CommandNode.svelte'
   import ModelTree from './ModelTree.svelte'
   import { NODE_SIZE, NODE_SPACING } from './constants'
   import { isChildOf } from './utils'
+  import GroupedNode from './GroupedNode.svelte'
 
   const dispatch = createEventDispatcher()
 
   // Props
-  export let root: LayoutNode
+  export let root: LayoutNode | GroupedNodes
   export let selected: LayoutNode
   export let offset: [number, number] = [0, 0]
 
@@ -40,42 +41,46 @@
 </script>
 
 {#if root}
-  <CommandNode
-    command={root.command}
-    left={offset[0] + root.pos}
-    top={offset[1]}
-    selected={selected?.command.resultName === root.command.resultName}
-    {active}
-    on:click={handleClick}
-  />
+  {#if root.nodes}
+    <GroupedNode {root} left={offset[0]} top={offset[1]} on:selected />
+  {:else}
+    <CommandNode
+      command={root.command}
+      left={offset[0] + root.pos}
+      top={offset[1]}
+      selected={selected?.command.resultName === root.command.resultName}
+      {active}
+      on:click={handleClick}
+    />
 
-  {#each root.children as child}
-    <div
-      class="mpilot-vertical-line"
-      style={`left: ${offset[0] + child.offset.x + child.pos + NODE_SIZE.w / 2}px; top: ${
-        offset[1] + NODE_SIZE.h + NODE_SPACING.y / 2
-      }px`}
-      transition:scale
-    />
-    <ModelTree
-      root={child}
-      offset={[offset[0] + child.offset.x, offset[1] + NODE_SIZE.h + NODE_SPACING.y]}
-      {selected}
-      on:selected
-    />
-  {/each}
+    {#each root.children as child}
+      <div
+        class="mpilot-vertical-line"
+        style={`left: ${offset[0] + child.offset.x + child.pos + NODE_SIZE.w / 2}px; top: ${
+          offset[1] + NODE_SIZE.h + NODE_SPACING.y / 2
+        }px`}
+        transition:scale
+      />
+      <ModelTree
+        root={child}
+        offset={[offset[0] + child.offset.x, offset[1] + NODE_SIZE.h + NODE_SPACING.y]}
+        {selected}
+        on:selected
+      />
+    {/each}
 
-  {#if root.children.length}
-    <div
-      class="mpilot-vertical-line"
-      style={`left: ${offset[0] + root.pos + NODE_SIZE.w / 2}px; top: ${offset[1] + NODE_SIZE.h + 1}px`}
-      transition:scale
-    />
-    <div
-      class="mpilot-horizontal-line"
-      style={`left: ${connectorLine.left}px; top: ${connectorLine.top}px; width: ${connectorLine.length}px`}
-      transition:scale
-    />
+    {#if root.children.length}
+      <div
+        class="mpilot-vertical-line"
+        style={`left: ${offset[0] + root.pos + NODE_SIZE.w / 2}px; top: ${offset[1] + NODE_SIZE.h + 1}px`}
+        transition:scale
+      />
+      <div
+        class="mpilot-horizontal-line"
+        style={`left: ${connectorLine.left}px; top: ${connectorLine.top}px; width: ${connectorLine.length}px`}
+        transition:scale
+      />
+    {/if}
   {/if}
 {/if}
 
