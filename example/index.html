@@ -306,20 +306,56 @@
       <h2>Mode</h2>
       <div><label><input type="radio" name="mode" value="narrow" checked onClick="setNarrow()"> Narrow</label></div>
       <div><label><input type="radio" name="mode" value="narrow" onClick="setFull()"> Full</label></div>
+      <div>&nbsp;</div>
+      <div><label><input type="checkbox" onClick="toggleValues()" /> Show Values</label></div>
     </div>
   </div>
   <script>
+    const values = {
+      Low_Permanent_Development_Fz: {
+        value: -0.08,
+        label: 'Moderately Low',
+        color: '#b38db0'
+      },
+      Low_Vegetation_State_Impacts_without_VegDeparture_Fz: {
+        value: -0.4,
+        label: 'Moderately Low',
+        color: '#b38db0'
+      },
+      Low_Natural_Habitat_Fragmentation_v2_WtedUnion_Fz: {
+        value: -0.93,
+        label: 'Very Low',
+        color: '#ffffdb'
+      },
+      Terrestrial_Landscape_Intactness_Updated_Frag_Fz: {
+        value: -0.67,
+        label: 'Low',
+        color: '#9eaad7',
+      },
+    }
+
     const diagram = mpilotUI.createDiagram('model', document.getElementById('ModelSource').innerHTML.trim(), {mode: 'narrow'})
     diagram.addEventListener('selected', e => console.log('selected', e.detail.node))
 
     let width = 600
     let isDragging = false
+    let showValues = false
 
     function setNarrow() {
       diagram.setOptions({mode: 'narrow'})
     }
     function setFull() {
       diagram.setOptions({mode: 'full'})
+    }
+    function toggleValues() {
+      showValues = !showValues
+
+      if (showValues) {
+        diagram.setOptions({ values })
+      }
+      else {
+        diagram.setOptions({values: undefined})
+      }
     }
 
     const dragElement = document.getElementById('drag')

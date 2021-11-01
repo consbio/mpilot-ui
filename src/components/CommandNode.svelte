@@ -2,9 +2,11 @@
   import { scale } from 'svelte/transition'
   import type { BaseCommand } from 'mpilot/lib/commands'
   import { NODE_SIZE } from './constants'
+  import type { NodeValue } from './components'
 
   // Props
   export let command: BaseCommand
+  export let value: NodeValue
   export let left: number
   export let top: number
   export let selected = false
@@ -30,10 +32,17 @@
     role="button"
     title={displayName}
     transition:scale
-    on:pointerdown={e => e.stopPropagation()}
     on:click
   >
-    <div class="mpilot-title">{displayName}</div>
+    <div class="mpilot-title">
+      {#if value}
+        <div class="mpilot-node-value" title={value.label}>
+          <div class="mpilot-node-color" style={`background: ${value.color}`} />
+          {value.value}
+        </div>
+      {/if}
+      {displayName}
+    </div>
     <div class="mpilot-node-name">{command.displayName}</div>
   </div>
 {/key}
@@ -66,6 +75,26 @@
     color: #00330b;
     max-height: 100%;
     overflow: hidden;
+  }
+
+  .mpilot-node-value {
+    float: right;
+    width: 32px;
+    max-width: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-left: 5px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .mpilot-node-color {
+    min-width: 30px;
+    height: 30px;
+    border: 1px solid darkgray;
+    border-radius: 4px;
+    margin-bottom: 5px;
   }
 
   .mpilot-node-name {

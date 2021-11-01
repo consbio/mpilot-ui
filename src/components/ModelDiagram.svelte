@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { Program } from 'mpilot/lib'
-  import type { LayoutNode, DiagramMode, SelectEvent } from './components'
+  import type { LayoutNode, DiagramMode, SelectEvent, NodeValues } from './components'
   import ModelTree from './ModelTree.svelte'
   import ScaleControl from './ScaleControl.svelte'
   import { NODE_SIZE } from './constants'
@@ -20,6 +20,7 @@
 
   // Props
   export let program: Program
+  export let values: NodeValues | undefined
   export let mode: DiagramMode = 'full'
   export let scale: number = 1
 
@@ -209,6 +210,9 @@
 
   const handlePointerMove = (e: PointerEvent) => {
     if (isDragging) {
+      if (Math.max(Math.abs(e.x - dragStart!.x), Math.abs(e.y - dragStart!.y)) > 10) {
+        disableSelect = true
+      }
       moveView(-e.movementX, -e.movementY)
     }
   }
@@ -243,7 +247,7 @@
     bind:this={containerNode}
   >
     {#if root}
-      <ModelTree root={narrowRoot || root} {selected} on:selected={handleSelected} />
+      <ModelTree root={narrowRoot || root} {values} {selected} on:selected={handleSelected} />
     {/if}
   </div>
 </div>

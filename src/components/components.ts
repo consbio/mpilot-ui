@@ -22,3 +22,13 @@ export type DiagramMode = 'full' | 'narrow'
 export interface SelectEvent {
   node: LayoutNode
 }
+
+export interface NodeValue {
+  value: number
+  label: string
+  color: string
+}
+
+export interface NodeValues {
+  [name: string]: NodeValue
+}
