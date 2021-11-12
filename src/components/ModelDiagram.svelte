@@ -94,22 +94,25 @@
   $: {
     if ($appliedScale !== prevScale) {
       if (prevScale) {
-        const scaledMid = {
-          x: $diagramX / prevScale + diagramSize.w / prevScale / 2,
-          y: $diagramY / prevScale + diagramSize.h / prevScale / 2,
-        }
+        if (mode === 'full') {
+          const scaledMid = {
+            x: $diagramX / prevScale + diagramSize.w / prevScale / 2,
+            y: $diagramY / prevScale + diagramSize.h / prevScale / 2,
+          }
 
-        const scaledPos = {
-          x: scaledMid.x - diagramSize.w / $appliedScale / 2,
-          y: scaledMid.y - diagramSize.h / $appliedScale / 2,
-        }
+          const scaledPos = {
+            x: scaledMid.x - diagramSize.w / $appliedScale / 2,
+            y: scaledMid.y - diagramSize.h / $appliedScale / 2,
+          }
 
-        const realPos = {
-          x: scaledPos.x * $appliedScale,
-          y: scaledPos.y * $appliedScale,
-        }
+          const realPos = {
+            x: scaledPos.x * $appliedScale,
+            y: scaledPos.y * $appliedScale,
+          }
 
-        diagramX = tweened(realPos.x)
+          diagramX = tweened(realPos.x)
+          diagramY = tweened(realPos.y)
+        }
       }
 
       prevScale = $appliedScale
@@ -150,7 +153,7 @@
       if (!selected) {
         selected = prevSelected = narrowRoot
         centerOn(selected)
-      } else if (selected !== prevSelected) {
+      } else {
         selected = prevSelected = findNode(narrowRoot, selected)
         centerOn(selected || undefined)
       }
