@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { scale } from 'svelte/transition'
-  import type { LayoutNode, GroupedNodes, SelectEvent, NodeValues } from './components'
+  import type { LayoutNode, GroupedNodes, SelectEvent, NodeValues, InfoEvent } from './components'
   import CommandNode from './CommandNode.svelte'
   import ModelTree from './ModelTree.svelte'
   import { NODE_SIZE, NODE_SPACING } from './constants'
@@ -39,6 +39,10 @@
   const handleClick = () => {
     dispatch('selected', { node: root } as SelectEvent)
   }
+
+  const handleInfo = () => {
+    dispatch('info', { node: root } as InfoEvent)
+  }
 </script>
 
 {#if root}
@@ -53,6 +57,7 @@
       selected={selected?.command.resultName === root.command.resultName}
       {active}
       on:click={handleClick}
+      on:info={handleInfo}
     />
 
     {#each root.children as child}
@@ -69,6 +74,7 @@
         offset={[offset[0] + child.offset.x, offset[1] + NODE_SIZE.h + NODE_SPACING.y]}
         {selected}
         on:selected
+        on:info
       />
     {/each}
 

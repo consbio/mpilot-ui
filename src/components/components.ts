@@ -23,6 +23,10 @@ export interface SelectEvent {
   node: LayoutNode
 }
 
+export interface InfoEvent {
+  node: LayoutNode
+}
+
 export interface NodeValue {
   value: number
   label: string

@@ -13,8 +13,9 @@ class DiagramWrapper {
   constructor(diagram: ModelDiagram, target: Element) {
     this.diagram = diagram
     this.target = target
-
-    this.diagram.$on('selected', e => this.target.dispatchEvent(e))
+    ;['selected', 'info'].forEach(event => {
+      this.diagram.$on(event, e => this.target.dispatchEvent(e))
+    })
   }
 
   addEventListener() {
@@ -39,7 +40,7 @@ class DiagramWrapper {
   }
 }
 
-export const createDiagram = (node: string | HTMLElement, model: string, options: DiagramOptions) => {
+export const createDiagram = (node: string | HTMLElement, model: string | Program, options: DiagramOptions) => {
   const { mode } = options
 
   let domNode: HTMLElement
@@ -54,8 +55,16 @@ export const createDiagram = (node: string | HTMLElement, model: string, options
     }
   }
 
-  const program = Program.fromSource(model)
+  let program: Program
+  if (typeof model === 'string') {
+    program = Program.fromSource(model)
+  } else {
+    program = model
+  }
+
   const diagram = new ModelDiagram({ target: domNode, props: { program, mode } })
 
   return new DiagramWrapper(diagram, domNode)
 }
+
+export * from 'mpilot'

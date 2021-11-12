@@ -20,7 +20,7 @@
 
   // Props
   export let program: Program
-  export let values: NodeValues | undefined
+  export let values: NodeValues | undefined = undefined
   export let mode: DiagramMode = 'full'
   export let scale: number = 1
 
@@ -247,7 +247,7 @@
     bind:this={containerNode}
   >
     {#if root}
-      <ModelTree root={narrowRoot || root} {values} {selected} on:selected={handleSelected} />
+      <ModelTree root={narrowRoot || root} {values} {selected} on:selected={handleSelected} on:info />
     {/if}
   </div>
 </div>
@@ -262,6 +262,7 @@
     overflow: hidden;
     background: white;
     cursor: pointer;
+    font-family: Tahoma, serif;
   }
 
   .mpilot-container-stripe {
