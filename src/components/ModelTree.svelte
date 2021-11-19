@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { scale } from 'svelte/transition'
-  import type { LayoutNode, GroupedNodes, SelectEvent, NodeValues, InfoEvent } from './components'
+  import type { LayoutNode, GroupedNodes, SelectEvent, NodeValues, InfoEvent, NodeLabels } from './components'
   import CommandNode from './CommandNode.svelte'
   import ModelTree from './ModelTree.svelte'
   import { NODE_SIZE, NODE_SPACING } from './constants'
@@ -13,6 +13,7 @@
   // Props
   export let root: LayoutNode | GroupedNodes
   export let values: NodeValues | undefined
+  export let labels: NodeLabels | undefined
   export let selected: LayoutNode
   export let offset: [number, number] = [0, 0]
 
@@ -52,6 +53,7 @@
     <CommandNode
       command={root.command}
       value={(values || {})[root.command.resultName]}
+      label={(labels || {})[root.command.resultName]}
       left={offset[0] + root.pos}
       top={offset[1]}
       selected={selected?.command.resultName === root.command.resultName}
@@ -71,6 +73,7 @@
       <ModelTree
         root={child}
         {values}
+        {labels}
         offset={[offset[0] + child.offset.x, offset[1] + NODE_SIZE.h + NODE_SPACING.y]}
         {selected}
         on:selected

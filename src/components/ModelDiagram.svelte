@@ -1,19 +1,11 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { Program } from 'mpilot/lib'
-  import type { LayoutNode, DiagramMode, SelectEvent, NodeValues } from './components'
+  import type { LayoutNode, DiagramMode, SelectEvent, NodeValues, NodeLabels } from './components'
   import ModelTree from './ModelTree.svelte'
   import ScaleControl from './ScaleControl.svelte'
   import { NODE_SIZE } from './constants'
-  import {
-    calculateHeight,
-    calculateOffset,
-    calculateWidth,
-    findNode,
-    getDependencyLookup,
-    layoutTree,
-    narrowTree,
-  } from './utils'
+  import { calculateHeight, calculateOffset, calculateWidth, findNode, layoutTree, narrowTree } from './utils'
   import { tweened } from 'svelte/motion'
 
   const dispatch = createEventDispatcher()
@@ -21,6 +13,7 @@
   // Props
   export let program: Program
   export let values: NodeValues | undefined = undefined
+  export let labels: NodeLabels | undefined = undefined
   export let mode: DiagramMode = 'full'
   export let scale: number = 1
 
@@ -63,6 +56,10 @@
       }
 
       if (mode !== prevMode) {
+        if (root && selected?.command?.resultName !== root.command.resultName) {
+          dispatch('selected', { node: root } as SelectEvent)
+        }
+
         prevMode = mode
         selected = root
       }
@@ -123,7 +120,7 @@
     if (program && program !== prevProgram) {
       prevProgram = program
 
-      const { dependents, dependencies } = getDependencyLookup(program)
+      const { dependents, dependencies } = program.getDependencyLookup()
       const rootCommands = Object.values(program.commands).filter(command => !dependents[command.resultName])
       if (rootCommands.length) {
         root = layoutTree(rootCommands[0], dependencies, program)
@@ -141,14 +138,21 @@
 
   $: {
     if (root && diagramSize && mode === 'narrow') {
-      if (mode !== prevMode) {
-        prevMode = mode
-        selected = null
-      }
-
       narrowRoot = narrowTree(root, { w: diagramSize.w / scale, h: diagramSize / scale }, selected || undefined)
       treeHeight = calculateHeight(narrowRoot)
       treeWidth = calculateWidth(narrowRoot)
+
+      if (mode !== prevMode) {
+        prevMode = mode
+
+        if (selected?.command?.resultName !== narrowRoot.command.resultName) {
+          dispatch('selected', { node: selected } as SelectEvent)
+        }
+
+        selected = null
+      } else if (!selected) {
+        dispatch('selected', { node: narrowRoot } as SelectEvent)
+      }
 
       if (!selected) {
         selected = prevSelected = narrowRoot
@@ -200,7 +204,6 @@
   const handlePointerDown = (e: PointerEvent) => {
     isDragging = true
     dragStart = { x: e.x, y: e.y }
-    containerNode.setPointerCapture(e.pointerId)
   }
 
   const handlePointerUp = (e: PointerEvent) => {
@@ -214,6 +217,7 @@
   const handlePointerMove = (e: PointerEvent) => {
     if (isDragging) {
       if (Math.max(Math.abs(e.x - dragStart!.x), Math.abs(e.y - dragStart!.y)) > 10) {
+        containerNode.setPointerCapture(e.pointerId)
         disableSelect = true
       }
       moveView(-e.movementX, -e.movementY)
@@ -226,8 +230,10 @@
 
   const handleSelected = (e: CustomEvent<SelectEvent>) => {
     if (!disableSelect) {
+      if (e.detail.node !== selected) {
+        dispatch('selected', e.detail)
+      }
       selected = e.detail.node
-      dispatch('selected', e.detail)
     }
   }
 </script>
@@ -250,7 +256,7 @@
     bind:this={containerNode}
   >
     {#if root}
-      <ModelTree root={narrowRoot || root} {values} {selected} on:selected={handleSelected} on:info />
+      <ModelTree root={narrowRoot || root} {values} {labels} {selected} on:selected={handleSelected} on:info />
     {/if}
   </div>
 </div>

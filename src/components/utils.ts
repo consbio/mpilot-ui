@@ -236,48 +236,6 @@ export const narrowTree = (
   return newRoot
 }
 
-export const getDependencyLookup = (program: Program) => {
-  const lookup: { dependents: { [resultName: string]: string[] }; dependencies: { [resultName: string]: string[] } } = {
-    dependents: {},
-    dependencies: {},
-  }
-
-  Object.values(program.commands).forEach(command => {
-    let references: string[] = []
-
-    command.args.forEach(arg => {
-      let value: any
-      if (command.inputs[arg.name]) {
-        const inp = command.inputs[arg.name]
-        value = inp.clean(arg.value, program, arg.lineno)
-
-        if ((inp as AnyParameter) instanceof ResultParameter) {
-          references.push(value instanceof BaseCommand ? value.resultName : value)
-        }
-        if (Array.isArray(value)) {
-          references = [
-            ...references,
-            ...flatten(value)
-              .filter(item => item instanceof BaseCommand)
-              .map(item => (item instanceof BaseCommand ? item.resultName : item)),
-          ]
-        }
-      }
-    })
-
-    lookup.dependencies[command.resultName] = references
-
-    references.forEach(reference => {
-      lookup.dependents[reference] = lookup.dependents[reference] || []
-      if (!lookup.dependents[reference].includes(command.resultName)) {
-        lookup.dependents[reference].push(command.resultName)
-      }
-    })
-  })
-
-  return lookup
-}
-
 export const calculateOffset = (node: LayoutNode): { x: number; y: number } => {
   let parentOffset = node.parent ? calculateOffset(node.parent) : { x: 0, y: 0 }
   return {

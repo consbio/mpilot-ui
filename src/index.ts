@@ -1,9 +1,10 @@
 import { Program } from 'mpilot/lib'
 import ModelDiagram from './components/ModelDiagram.svelte'
-import type { DiagramMode } from './components/components'
+import type { DiagramMode, NodeLabels } from './components/components'
 
 export interface DiagramOptions {
   mode?: DiagramMode
+  labels: NodeLabels
 }
 
 class DiagramWrapper {
@@ -41,7 +42,7 @@ class DiagramWrapper {
 }
 
 export const createDiagram = (node: string | HTMLElement, model: string | Program, options: DiagramOptions) => {
-  const { mode } = options
+  const { mode, labels } = options
 
   let domNode: HTMLElement
   if (node instanceof HTMLElement) {
@@ -62,9 +63,9 @@ export const createDiagram = (node: string | HTMLElement, model: string | Progra
     program = model
   }
 
-  const diagram = new ModelDiagram({ target: domNode, props: { program, mode } })
+  const diagram = new ModelDiagram({ target: domNode, props: { program, mode, labels } })
 
   return new DiagramWrapper(diagram, domNode)
 }
 
-export * from 'mpilot'
+export * from 'mpilot/lib'

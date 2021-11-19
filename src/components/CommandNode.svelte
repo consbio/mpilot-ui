@@ -5,11 +5,15 @@
   import { NODE_SIZE } from './constants'
   import type { NodeValue } from './components'
 
+  // eslint-disable-next-line import/no-unresolved
+  import { stripHtml } from 'string-strip-html'
+
   const dispatch = createEventDispatcher()
 
   // Props
   export let command: BaseCommand
   export let value: NodeValue
+  export let label: string
   export let left: number
   export let top: number
   export let selected = false
@@ -21,7 +25,9 @@
   $: {
     if (command) {
       const metadata = command.getMetadata()
-      displayName = (metadata?.DisplayName || '').replaceAll('&nbsp;', ' ').replaceAll('+', ' ') || command.resultName
+
+      displayName =
+        label || stripHtml((metadata?.DisplayName || command.resultName).replace(/(&nbsp;)|\+|\xA0/gi, ' ')).result
     }
   }
 
@@ -54,9 +60,9 @@
           <div title={value.label}>{value.value}</div>
         {/if}
       </div>
-      {displayName}
+      <div>{@html displayName}</div>
     </div>
-    <div class="mpilot-node-name">{command.displayName}</div>
+    <div class="mpilot-node-name" title={command.displayName}>{command.displayName}</div>
   </div>
 {/key}
 
@@ -129,7 +135,7 @@
 
   .mpilot-node-name {
     padding: 5px;
-    font-size: 14px;
+    font-size: 12px;
     color: #00441b;
     border-top: 1px solid #ccc;
     background-color: #e0f3db;

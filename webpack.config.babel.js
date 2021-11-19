@@ -1,4 +1,5 @@
 import path from 'path'
+import webpack from 'webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import sveltePreprocess from 'svelte-preprocess'
 
@@ -77,6 +78,7 @@ export default {
     new MiniCssExtractPlugin({
       filename: '[name].bundle.css',
     }),
+    new webpack.ProvidePlugin({ _entities: 'parse-entities' }),
   ],
   output: {
     path: path.resolve(__dirname, 'dist'),

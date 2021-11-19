@@ -36,3 +36,7 @@ export interface NodeValue {
 export interface NodeValues {
   [name: string]: NodeValue
 }
+
+export interface NodeLabels {
+  [name: string]: string
+}
