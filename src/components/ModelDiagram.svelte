@@ -138,24 +138,21 @@
 
   $: {
     if (root && diagramSize && mode === 'narrow') {
+      if (mode !== prevMode) {
+        prevMode = mode
+
+        if (selected?.command?.resultName !== root.command.resultName) {
+          selected = null
+        }
+      }
+
       narrowRoot = narrowTree(root, { w: diagramSize.w / scale, h: diagramSize / scale }, selected || undefined)
       treeHeight = calculateHeight(narrowRoot)
       treeWidth = calculateWidth(narrowRoot)
 
-      if (mode !== prevMode) {
-        prevMode = mode
-
-        if (selected?.command?.resultName !== narrowRoot.command.resultName) {
-          dispatch('selected', { node: selected } as SelectEvent)
-        }
-
-        selected = null
-      } else if (!selected) {
-        dispatch('selected', { node: narrowRoot } as SelectEvent)
-      }
-
       if (!selected) {
         selected = prevSelected = narrowRoot
+        dispatch('selected', { node: narrowRoot } as SelectEvent)
         centerOn(selected)
       } else {
         selected = prevSelected = findNode(narrowRoot, selected)

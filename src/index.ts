@@ -39,6 +39,10 @@ class DiagramWrapper {
   update() {
     this.diagram.$$.update()
   }
+
+  destroy() {
+    this.diagram.$destroy()
+  }
 }
 
 export const createDiagram = (node: string | HTMLElement, model: string | Program, options: DiagramOptions) => {

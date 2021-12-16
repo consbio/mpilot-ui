@@ -49,8 +49,10 @@
     on:click
   >
     <div class="mpilot-title">
+      <div class="mpilot-title-label">{@html displayName}</div>
       <div class="mpilot-node-value">
         <button class="mpilot-node-info" on:click={handleInfo}>i</button>
+
         {#if value}
           <div
             class="mpilot-node-color"
@@ -60,7 +62,6 @@
           <div title={value.label}>{value.value}</div>
         {/if}
       </div>
-      <div>{@html displayName}</div>
     </div>
     <div class="mpilot-node-name" title={command.displayName}>{command.displayName}</div>
   </div>
@@ -88,19 +89,27 @@
   }
 
   .mpilot-title {
+    display: flex;
     font-size: 14px;
-    padding: 5px;
+    padding: 5px 5px 0 5px;
     flex-grow: 1;
     color: #00330b;
     max-height: 100%;
     overflow: hidden;
+    line-height: 1.3;
+  }
+
+  .mpilot-title-label {
+    flex-grow: 1;
+    max-width: calc(100% - 37px);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mpilot-node-value {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    float: right;
     width: 32px;
     max-width: 40px;
     overflow: hidden;
@@ -128,9 +137,9 @@
   .mpilot-node-color {
     width: 15px;
     height: 15px;
+    min-height: 15px;
     border: 1px solid darkgray;
     border-radius: 4px;
-    margin-bottom: 5px;
   }
 
   .mpilot-node-name {
