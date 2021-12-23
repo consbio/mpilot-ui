@@ -4,6 +4,9 @@
   import { NODE_SIZE } from './constants'
   import { createEventDispatcher } from 'svelte'
 
+  // eslint-disable-next-line import/no-unresolved
+  import { stripHtml } from 'string-strip-html'
+
   const dispatch = createEventDispatcher()
 
   // Props
@@ -13,6 +16,17 @@
 
   // State
   let selectElement: HTMLSelectElement
+  let labels: string[]
+
+  $: {
+    if (root) {
+      labels = root.nodes.map(node => {
+        const metadata = node.command.getMetadata()
+
+        return stripHtml((metadata?.DisplayName || node.command.resultName).replace(/(&nbsp;)|\+|\xA0/gi, ' ')).result
+      })
+    }
+  }
 
   const onChange = (e: Event) => {
     const selected = root.nodes.find(n => n.command.resultName === (e.target as HTMLSelectElement).value)
@@ -32,8 +46,10 @@
     <div class="mpilot-grouped-label">
       <select on:pointerdown={e => e.stopPropagation()} on:change={onChange} bind:this={selectElement}>
         <option value="" disabled selected>{root.nodes.length} more...</option>
-        {#each root.nodes as node}
-          <option value={node.command.resultName}>{node.command.resultName}</option>
+        {#each root.nodes as node, i}
+          <option value={node.command.resultName}>
+            {labels[i]}
+          </option>
         {/each}
       </select>
     </div>
