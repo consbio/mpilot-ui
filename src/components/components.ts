@@ -4,6 +4,7 @@ import type { BaseCommand } from 'mpilot/lib/commands'
 import type { Polygon } from '@flatten-js/core'
 
 export interface LayoutNode {
+  id: string
   command: BaseCommand
   parent?: LayoutNode
   children: LayoutNode[]

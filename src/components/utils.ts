@@ -1,6 +1,5 @@
 import type { Program } from 'mpilot/lib'
 import { BaseCommand } from 'mpilot/lib/commands'
-import { ResultParameter, AnyParameter } from 'mpilot/lib/params'
 import { NODE_SIZE, NODE_SPACING } from './constants'
 
 // eslint-disable-next-line import/no-unresolved
@@ -24,7 +23,7 @@ export const flatten = (arr: any[]) => {
 }
 
 export const isChildOf = (child: LayoutNode, parent: LayoutNode): boolean => {
-  if (child.command.resultName === parent.command.resultName) {
+  if (child.id === parent.id) {
     return true
   }
 
@@ -32,7 +31,7 @@ export const isChildOf = (child: LayoutNode, parent: LayoutNode): boolean => {
     return false
   }
 
-  if (parent.children.some(c => c.command.resultName === child.command.resultName)) {
+  if (parent.children.some(c => c.id === child.id)) {
     return true
   }
 
@@ -54,15 +53,24 @@ export const findNode = (root: LayoutNode, node: LayoutNode): LayoutNode | null 
   return null
 }
 
+export const makeId = (command: BaseCommand, n: number) => {
+  const base = command.resultName
+    .split(/\s+/)
+    .map(s => s.toLowerCase())
+    .join('-')
+  return `${base}-${n}`
+}
+
 export const layoutTree = (
   root: BaseCommand,
   dependencies: { [resultName: string]: string[] },
   program: Program,
   yOffset = 0,
+  id = 0,
 ): LayoutNode => {
   const children =
-    dependencies[root.resultName]?.map(name =>
-      layoutTree(program.commands[name], dependencies, program, yOffset + NODE_SIZE.h + NODE_SPACING.y),
+    dependencies[root.resultName]?.map((name, i) =>
+      layoutTree(program.commands[name], dependencies, program, yOffset + NODE_SIZE.h + NODE_SPACING.y, id + i + 1),
     ) || []
 
   let polygon: Polygon | null = null
@@ -119,6 +127,7 @@ export const layoutTree = (
   }
 
   const node = {
+    id: makeId(root, id),
     command: root,
     children,
     offset: { x: 0, y: yOffset },
@@ -175,6 +184,7 @@ export const narrowTree = (
     if (!canFitCollapsed) {
       const numCanFit = Math.max(1, Math.floor(diagramSize.w / (NODE_SIZE.w + NODE_SPACING.x)) - 1)
       const grouped = {
+        id: 'group',
         command: new BaseCommand('', [], newRoot.command.program, 0),
         parent: newRoot,
         children: [],
