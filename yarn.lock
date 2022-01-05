@@ -3370,10 +3370,10 @@ mkdirp@^0.5.1, mkdirp@^0.5.5:
   dependencies:
     minimist "^1.2.5"
 
-mpilot@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/mpilot/-/mpilot-0.2.1.tgz#c99daf7b48a112d5227b9f7fa62a66a05b4047a7"
-  integrity sha512-/YpgLGjK2PcXd/TMAH6BwFEg4HP9BgdKPTYd7z95Wo5ojRaqAQPMMriGQBib2EokDGN3nn51/lqe7GFFQfaVcQ==
+mpilot@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/mpilot/-/mpilot-0.2.2.tgz#e8ed04b34ad58e27fbc38322ca18408d442f1268"
+  integrity sha512-dArtoDtIFOsj5x/eCzSiKXq/rRsjPZnfvq8nfgJpWPhYBz4rYYD0dqGVolHPs0nyD+rPG1sfdUIpR3DJYQd9tA==
   dependencies:
     parse-entities "^3.1.0"
 
