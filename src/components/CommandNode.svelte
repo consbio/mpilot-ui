@@ -45,7 +45,7 @@
     style={`width: ${NODE_SIZE.w}px; height: ${NODE_SIZE.h}px; left: ${left}px; top: ${top}px;`}
     role="button"
     title={displayName}
-    transition:scale|local
+    transition:scale
     on:click
   >
     <div class="mpilot-title">
