@@ -3370,10 +3370,10 @@ mkdirp@^0.5.1, mkdirp@^0.5.5:
   dependencies:
     minimist "^1.2.5"
 
-mpilot@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/mpilot/-/mpilot-0.2.2.tgz#e8ed04b34ad58e27fbc38322ca18408d442f1268"
-  integrity sha512-dArtoDtIFOsj5x/eCzSiKXq/rRsjPZnfvq8nfgJpWPhYBz4rYYD0dqGVolHPs0nyD+rPG1sfdUIpR3DJYQd9tA==
+mpilot@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/mpilot/-/mpilot-0.3.0.tgz#40b96674b89350ddac45dcf694331c23170d1b0a"
+  integrity sha512-I8HaYel9ontUTudrOoTWe7pfPi9qc5qQNQkfXJ7eucvplGZufYqCic2T7h89bVxem582vzKrXYqcWyjwkZTg8Q==
   dependencies:
     parse-entities "^3.1.0"
 
@@ -4638,10 +4638,10 @@ svelte-preprocess@^4.0.0, svelte-preprocess@^4.9.5:
     sorcery "^0.10.0"
     strip-indent "^3.0.0"
 
-svelte@^3.43.0:
-  version "3.43.0"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.43.0.tgz#d28d06ec523bf0cea3de15558a3241c339a85762"
-  integrity sha512-T2pMPHrxXp+SM8pLLUXLQgkdo+JhTls7aqj9cD7z8wT2ccP+OrCAmtQS7h6pvMjitaZhXFNnCK582NxDpy8HSw==
+svelte@^3.46.3:
+  version "3.46.3"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.46.3.tgz#31202b0c795f276726d95b648b6dd413116257ac"
+  integrity sha512-mTOXvv74CVQqJHqoIZDprVfRKVVmYNadXP0VKnOEA54223kLGCr1nMrifS4Zx29qMt/xRB38Eq1D7dDH/fM8fQ==
 
 table@^6.0.9:
   version "6.7.1"

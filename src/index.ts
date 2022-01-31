@@ -1,6 +1,6 @@
-import { Program } from 'mpilot/lib'
 import ModelDiagram from './components/ModelDiagram.svelte'
 import type { DiagramMode, NodeLabels } from './components/components'
+import { Program } from 'mpilot'
 
 export interface DiagramOptions {
   mode?: DiagramMode
@@ -72,4 +72,4 @@ export const createDiagram = (node: string | HTMLElement, model: string | Progra
   return new DiagramWrapper(diagram, domNode)
 }
 
-export * from 'mpilot/lib'
+export * from 'mpilot'

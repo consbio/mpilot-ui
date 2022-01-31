@@ -68,7 +68,7 @@
         style={`left: ${offset[0] + child.offset.x + child.pos + NODE_SIZE.w / 2}px; top: ${
           offset[1] + NODE_SIZE.h + NODE_SPACING.y / 2
         }px`}
-        transition:scale
+        transition:scale|local
       />
       <ModelTree
         root={child}
@@ -85,12 +85,12 @@
       <div
         class="mpilot-vertical-line"
         style={`left: ${offset[0] + root.pos + NODE_SIZE.w / 2}px; top: ${offset[1] + NODE_SIZE.h + 1}px`}
-        transition:scale
+        transition:scale|local
       />
       <div
         class="mpilot-horizontal-line"
         style={`left: ${connectorLine.left}px; top: ${connectorLine.top}px; width: ${connectorLine.length}px`}
-        transition:scale
+        transition:scale|local
       />
     {/if}
   {/if}

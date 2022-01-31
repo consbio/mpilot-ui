@@ -14,7 +14,7 @@
   "author": "Conservation Biology Institute",
   "license": "MIT",
   "scripts": {
-    "build": "rm -Rf dist lib lib-esm && tsc && tsc -m es6 --outDir lib-esm && webpack --config webpack.config.babel.js --node-env production",
+    "build": "./build.sh",
     "start": "webpack --config webpack.config.babel.js"
   },
   "dependencies": {
@@ -25,10 +25,10 @@
     "@turf/intersect": "^6.5.0",
     "@turf/transform-translate": "^6.5.0",
     "@turf/union": "^6.5.0",
-    "mpilot": "^0.2.2",
+    "mpilot": "^0.3.0",
     "path-browserify": "^1.0.1",
     "string-strip-html": "^9.0.5",
-    "svelte": "^3.43.0"
+    "svelte": "^3.46.3"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",

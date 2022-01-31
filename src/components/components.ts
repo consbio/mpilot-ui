@@ -1,4 +1,4 @@
-import type { BaseCommand } from 'mpilot/lib/commands'
+import type { BaseCommand } from 'mpilot'
 
 // @ts-ignore
 import type { Polygon } from '@flatten-js/core'

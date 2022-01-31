@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import { Program } from 'mpilot/lib'
+  import { Program } from 'mpilot'
   import type { LayoutNode, DiagramMode, SelectEvent, NodeValues, NodeLabels } from './components'
   import ModelTree from './ModelTree.svelte'
   import ScaleControl from './ScaleControl.svelte'

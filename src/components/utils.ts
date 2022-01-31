@@ -1,5 +1,5 @@
-import type { Program } from 'mpilot/lib'
-import { BaseCommand } from 'mpilot/lib/commands'
+import type { Program } from 'mpilot'
+import { BaseCommand } from 'mpilot'
 import { NODE_SIZE, NODE_SPACING } from './constants'
 
 // eslint-disable-next-line import/no-unresolved
