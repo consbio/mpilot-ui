@@ -67,8 +67,8 @@
   }
 
   $: {
-    if (diagramNode && (diagramNode.offsetWidth !== diagramSize?.w || diagramNode.offsetHeight !== diagramSize?.h)) {
-      diagramSize = { w: diagramNode.offsetWidth, h: diagramNode.offsetHeight }
+    if (diagramNode) {
+      setDiagramSize()
     }
   }
 
@@ -161,6 +161,12 @@
     }
   }
 
+  const setDiagramSize = () => {
+    if (diagramNode && (diagramNode.offsetWidth !== diagramSize?.w || diagramNode.offsetHeight !== diagramSize?.h)) {
+      diagramSize = { w: diagramNode.offsetWidth, h: diagramNode.offsetHeight }
+    }
+  }
+
   const centerOn = (node?: LayoutNode) => {
     if (node && diagramSize) {
       const offset = calculateOffset(node)
@@ -234,6 +240,8 @@
     }
   }
 </script>
+
+<svelte:window on:resize={setDiagramSize} />
 
 <div
   class="mpilot-diagram"

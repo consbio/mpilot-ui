@@ -20,7 +20,8 @@
   export let active = false
 
   // State
-  let displayName
+  let element: HTMLDivElement
+  let displayName: string
 
   $: {
     if (command) {
@@ -45,8 +46,15 @@
     style={`width: ${NODE_SIZE.w}px; height: ${NODE_SIZE.h}px; left: ${left}px; top: ${top}px;`}
     role="button"
     title={displayName}
+    tabindex="0"
     transition:scale
+    bind:this={element}
     on:click
+    on:keydown={e => {
+      if (e.keyCode === 32 && element) {
+        element.click()
+      }
+    }}
   >
     <div class="mpilot-title">
       <div class="mpilot-title-label">{@html displayName}</div>
