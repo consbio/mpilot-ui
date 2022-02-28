@@ -135,7 +135,7 @@
     border: none;
     padding: 0 6px;
     cursor: pointer;
-    margin-bottom: 5px;
+    margin: 2px 2px 5px 0;
   }
 
   .mpilot-node-info:hover {
