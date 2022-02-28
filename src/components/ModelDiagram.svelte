@@ -254,6 +254,9 @@
   on:wheel={handleWheel}
 >
   <ScaleControl bind:scale />
+
+  <slot />
+
   <div class="mpilot-container-stripe" style={`transform: scale(1, ${$appliedScale}); top: calc(30%);`} />
   <div
     class="mpilot-container"
