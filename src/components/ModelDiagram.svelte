@@ -161,7 +161,7 @@
     }
   }
 
-  const setDiagramSize = () => {
+  export const setDiagramSize = () => {
     if (diagramNode && (diagramNode.offsetWidth !== diagramSize?.w || diagramNode.offsetHeight !== diagramSize?.h)) {
       diagramSize = { w: diagramNode.offsetWidth, h: diagramNode.offsetHeight }
     }
